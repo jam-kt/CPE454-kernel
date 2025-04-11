@@ -1,12 +1,19 @@
+MAKEFLAGS += --warn-undefined-variables
+
 arch ?= x86_64
-kernel := build/kernel-$(arch).img
+kernel := build/kernel-$(arch).bin
 img := build/boot-$(arch).img
 
 linker_script := src/arch/$(arch)/linker.ld
 grub_cfg := src/arch/$(arch)/grub.cfg
-assembly_source_files := $(wildcard src/arch/$(arch)/*.asm)
-assembly_object_files := $(patsubst src/arch/$(arch)/%.asm, \
-	build/arch/$(arch)/%.o, $(assembly_source_files))
+asm_src_files := $(wildcard src/arch/$(arch)/*.asm)
+asm_obj_files := $(patsubst src/arch/$(arch)/%.asm, build/arch/$(arch)/%.o, $(asm_src_files))
+
+CC := ~/cross/bin/$(arch)-elf-gcc
+CFLAGS := -Wall -pedantic -Werror -std=gnu99 -g -c -mno-red-zone
+c_src_files := $(wildcard src/*.c)
+c_obj_files := $(patsubst src/%.c, build/%.o, $(c_src_files))
+
 
 .PHONY: all clean run img
 
@@ -44,10 +51,15 @@ $(img): $(kernel)
 	sudo losetup -d $$LOOP_DISK; \
 	sudo losetup -d $$LOOP_PART 
 
-$(kernel): $(assembly_object_files) $(linker_script)
-	@ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files)
+$(kernel): $(asm_obj_files) $(c_obj_files) $(linker_script)
+	@ld -n -T $(linker_script) -o $(kernel) $(asm_obj_files) $(c_obj_files)
 
 # compile assembly files
 build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	@mkdir -p $(shell dirname $@)
 	@nasm -f elf64 $< -o $@
+
+# compile C files
+build/%.o: src/%.c
+	@mkdir -p $(shell dirname $@)
+	$(CC) $(CFLAGS) $< -o $@
