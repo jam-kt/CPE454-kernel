@@ -15,19 +15,20 @@ CPE453-kernel/
 │   │       ├── linker.ld
 │   │       ├── long_mode_init.asm
 │   │       ├── multiboot_header.asm
-|   |       ├── tty.c
-|   |       └── vga.h
+|   |       └── vga.c
 │   ├── include/
 │   │   └── kernel/
-│   │       └── tty.h
+│   │       └── vga.h
 |   └── kernel/
 │       └── main.c
 ├── libc/
 │   ├── arch/
 │   │   └── x86_64/
 │   ├── include/
-│   ├── stdio/
-│   └── string/
+│   │   ├── stdio.h
+│   │   └── string.h
+│   ├── string.c
+│   └── stdio.c
 
 
 If permission error occurs wheb trying to $make run then ensure the shell script 

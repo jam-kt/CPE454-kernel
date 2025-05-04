@@ -6,8 +6,12 @@ arch_obj_files := $(patsubst %.c,build/%.o,$(arch_c_files))
 common_c_files := $(shell find src/kernel -type f -name '*.c')
 common_obj_files := $(patsubst %.c,build/%.o,$(common_c_files))
 
+libc_c_files  := $(shell find libc -type f -name '*.c')
+libc_obj_files:= $(patsubst %.c,build/%.o,$(libc_c_files))
+
+
 # Combine all C source files.
-c_obj_files := $(arch_obj_files) $(common_obj_files)
+c_obj_files := $(arch_obj_files) $(common_obj_files) $(libc_obj_files)
 
 all_asm_files := $(shell find src -type f -name '*.asm')
 asm_obj_files := $(patsubst %.asm,build/%.o,$(all_asm_files))
@@ -17,7 +21,8 @@ kernel_bin := build/kernel-$(arch).bin
 img := build/boot-$(arch).img
 
 CC := ~/cross/bin/$(arch)-elf-gcc
-CFLAGS := -Wall -pedantic -Werror -std=gnu99 -g -c -mno-red-zone -Isrc/include -Ilibc/include
+CFLAGS := -Wall -Werror -std=gnu99 -g -c -mno-red-zone -ffreestanding
+CFLAGS += -Isrc/include -Ilibc/include 
 
 linker_script := src/arch/$(arch)/linker.ld
 grub_cfg := src/arch/$(arch)/grub.cfg
