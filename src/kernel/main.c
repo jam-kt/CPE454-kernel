@@ -3,6 +3,7 @@
 #include <kernel/vga.h>
 #include <string.h>
 #include <stdio.h>
+#include <kernel/ps2_kbd.h>
 
 void kernel_main() 
 {
@@ -29,6 +30,16 @@ void kernel_main()
     printk("%qd\n", (long long int)LONG_MAX); // "9223372036854775807"
     printk("%qu\n", (long long unsigned int)ULONG_MAX); // "18446744073709551615"
     
-    while(1);
+    void ps2_init(void);
+    void keyboard_init(void);
+
+    while(1) {
+        int ascii = keyboard_poll();
+        if (ascii == -1) {
+            continue;
+        }
+
+        printk("%c", (char)ascii);
+    }
 }
 

@@ -10,15 +10,18 @@ CPE453-kernel/
 ├── src/
 │   ├── arch/
 │   │   └── x86_64/
+│   │       ├── drivers/
+│   │       │   ├── vga.c
+│   │       │   └── ps2_kbd.c
 │   │       ├── boot.asm
 │   │       ├── grub.cfg
 │   │       ├── linker.ld
 │   │       ├── long_mode_init.asm
-│   │       ├── multiboot_header.asm
-|   |       └── vga.c
+|   |       └── multiboot_header.asm
 │   ├── include/
 │   │   └── kernel/
-│   │       └── vga.h
+│   │       ├── vga.h
+│   │       └── ps2_kbd.h
 |   └── kernel/
 │       └── main.c
 ├── libc/

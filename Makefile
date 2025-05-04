@@ -22,7 +22,7 @@ img := build/boot-$(arch).img
 
 CC := ~/cross/bin/$(arch)-elf-gcc
 CFLAGS := -Wall -Werror -std=gnu99 -g -c -mno-red-zone -ffreestanding
-CFLAGS += -Isrc/include -Ilibc/include 
+CFLAGS += -Isrc/include -Ilibc/include -masm=intel
 
 linker_script := src/arch/$(arch)/linker.ld
 grub_cfg := src/arch/$(arch)/grub.cfg

@@ -140,6 +140,8 @@ int printk(const char *fmt, ...)
             break;
 
         case 'x':
+            putstr("0x");
+            written += 2;
             uint64_t ux;
             if (lmod_q) {
                 ux = va_arg(ap, unsigned long long);
