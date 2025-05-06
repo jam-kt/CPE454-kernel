@@ -20,7 +20,7 @@ def generate_isr_stubs():
             if i in [8, 10, 11, 12, 13, 14, 17, 21, 29, 30]:
                 f.write(f"    push {i}\n")
             else:
-                f.write(f"    push 0xDEADBEEF\n")
+                f.write(f"    push 0\n")        # dummy error code
                 f.write(f"    push {i}\n")
             
             f.write("    jmp isr_handler\n\n")

@@ -4,21 +4,21 @@
 #include <stdio.h>
 #include "interrupt.h"
 
-/* write to port */
-static inline void outb(uint16_t port, uint8_t val)
-{
-    __asm__ volatile ( "outb %b0, %w1" : : "a"(val), "Nd"(port) : "memory");
-}
-
-/* read from port */
+/* inb and outb wrappers using intel syntax */
 static inline uint8_t inb(uint16_t port)
 {
     uint8_t ret;
-    __asm__ volatile ( "inb %w1, %b0"
+    asm volatile ("inb  %0, %1"
                    : "=a"(ret)
-                   : "Nd"(port)
-                   : "memory");
+                   : "Nd"(port));
     return ret;
+}
+
+static inline void outb(uint16_t port, uint8_t val)
+{
+    asm volatile ("outb %1, %0"
+                   :
+                   : "a"(val), "Nd"(port));
 }
 
 /* invoke a small delay by writing to an unused port */
@@ -32,7 +32,7 @@ static inline void io_wait(void)
  * - offset1: vector offset for master PIC vectors (offset1...offset1+7)
  * - offset2: vector offset for slave PIC vectors (offset2...offset2+7)
  */
-void PIC_remap(int offset1, int offset2)
+static void PIC_remap(int offset1, int offset2)
 {
     // starts the initialization sequence (in cascade mode)
     outb(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);
@@ -59,6 +59,14 @@ void PIC_remap(int offset1, int offset2)
     // Unmask both PICs
     outb(PIC1_DATA, 0);
     outb(PIC2_DATA, 0);
+}
+
+void IRQ_init()
+{
+    CLI();
+
+    /* reinitialize the PIC, change mapping [0x00, 0x1F] -> [0x20, 0x2F] */
+    PIC_remap(PIC1_VECTOR, PIC2_VECTOR);
 }
 
 /* signal the PIC that the IRQ has been servied. Checks for valid vector num */

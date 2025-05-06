@@ -16,7 +16,7 @@ inline void CLI()
 /* enable interrupts */
 inline void STI()
 {
-    asm ( "STI")
+    asm ( "STI");
 }
 
 inline bool are_interrupts_enabled()
@@ -43,27 +43,20 @@ static struct {
 
 struct IDT_entry idt[NUM_IRQS];
 
-void IRQ_init()
-{
-    CLI();
-
-    /* reinitialize the PIC, change mapping [0x00, 0x1F] -> [0x20, 0x2F] */
-    PIC_remap(PIC1_VECTOR, PIC2_VECTOR);
-}
 
 /*******************************************************************************
  *  INTERRUPT HANDLER
  ******************************************************************************/
 void c_isr_handler(int vector, unsigned err)
 {
-    if (irq_table[vector]) {
+    if (irq_table[vector].handler != NULL) {
         irq_table[vector].handler(vector, err, irq_table[vector].arg);
     } else {
         printk("Unhandled Interrupt Vector: %d", vector);
         while(1);
     }
 
-    PIC_sendEOI(vector)
+    PIC_sendEOI(vector);
 }
 
 
